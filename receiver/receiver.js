@@ -1,4 +1,4 @@
-/*
+
 const webSocket = new WebSocket("ws://192.168.214.166:3000")
 webSocket.onmessage = (Event)=> {
     handlesignallingdata(JSON.parse(Event.data))
@@ -98,4 +98,4 @@ function JoinCall() {
  function MuteVideo(IsCamera){
      IsCamera =!IsCamera
      localStream.getVideoTracks()[0].enabled= IsCamera
- }*/
+ }

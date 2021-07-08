@@ -1,4 +1,4 @@
-/*
+
 const Socket = require("websocket").server
 const http= require("http")
 
@@ -105,4 +105,4 @@ function findUser(username) {
     if(user[i]==username)
     return user[i]
     
-} */
+} 
