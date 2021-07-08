@@ -1,0 +1,38 @@
+#Video-Call-Div
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+
+}
+#Local-Video
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 8px;
+    border-radius: 16px;
+   max-width: 20%;
+    max-height: 40%;
+    background: #fff;
+}
+#Remote-Video
+{
+    background: #000;
+    width: 100%;
+    height: 100%;
+}
+.call-action-div
+{
+    position: absolute;
+    left: 45%;
+    bottom: 32px;
+}
+button
+{
+    cursor: pointer;
+}
+
