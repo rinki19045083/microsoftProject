@@ -1,13 +1,14 @@
 
-const webSocket = new WebSocket("ws://192.168.214.166:3000")
-webSocket.onmessage = (Event)=> {
-    handlesignallingdata(JSON.parse(Event.data))
+const webSocket = new WebSocket("ws://127.0.0.1:2000")
+
+webSocket.onmessage = (event)=> {
+    handleSignallingData(JSON.parse(event.data))
 }
-function handlesignallingdata(data)
+function  handleSignallingData(data)
 {
     switch(data.type)
     { case "offer":
-       peerconnection.setLocationDescription(data.offer)
+       peerconnection.setRemoteDescription(data.offer)
        createAndSendAnswer()
        break
      case "candidate":
@@ -19,42 +20,41 @@ function handlesignallingdata(data)
 function createAndSendAnswer()
 {
   peerconnection.createAnswer((answer)=> {
-      peerconnection.setLocationDescription(answer)
+      peerconnection.setLocalDescription(answer)
       sendData({
           type: "send_answer",
           answer: "answer"
-      },(error)=>{
+        })
+      }, error=>{
           console.log(error)
       })
-  })
+    
 }
-let peerconnection
+
 
 function sendData(data) {
     data.username=username
-    webSocket.send(JSON.stringify(data));
+    webSocket.send(JSON.stringify(data))
     
 }
 let peerconnection
 let localStream
 let username
-function JoinCall() {
+function joinCall() {
     username =  document.getElementById("username-input").value
     document.getElementById("Video-Call-div").style.display="inline"
     navigator.getUserMedia({
-        video:
-         {
-            frameRate:24,
-            aspectRatio:1.333333,
-        },
-        audio:true,
-    },(stream)=>{
-        localStream=stream
+        video:true,
+        audio:true
+    }, (stream) => {
+        localStream = stream
         document.getElementById("Local-Video").srcObject = localStream
+        
         let Configuration = {
-            iceserver: [ 
+            iceServers: [ 
                 {
-                "url": ["stun4.l.google.com:19302","stun.ekiga.net","stun.voipbuster.com","stun.voipbuster.com"]
+                "urls": ["stun:stun3.l.google.com:19302",
+                "stun:stun.stunprotocol.org"]
                 }
             ]
 
@@ -62,15 +62,16 @@ function JoinCall() {
 
        peerconnection= new RTCPeerConnection(Configuration)
        peerconnection.addStream(localStream)
-       peerconnection.onaddstreme = (e) => {
+       peerconnection.onaddstream = (e) => {
 
         document.getElementById("Remote-Video").srcObject=e.stream
 
        }
 
        peerconnection.onicecandidate= ((e)=> {
-           if(e.candidate==null)
+           if(e.candidate == null)
            return 
+
            sendData({
                type: "send_candidate",
                candidate: e.candidate
@@ -78,24 +79,23 @@ function JoinCall() {
        })
         
        sendData({
-           type: "send_candidate",
-           candidate: e.candidate
+           type: "join_call"
+          
        })
 
-    }, (error)=>{
-        console.log(error);
+    }, (error) => {
+        console.log(error)
     })
     
 }
  
- let IsAudio = true
- function MuteAudio(IsAudio) {
-     IsAudio=!IsAudio
-
-     localStream.getAudioTracks()[0].enabled =IsAudio
+ let isAudio = true
+ function Muteaudio() {
+     isAudio = !isAudio
+     localStream.getAudioTracks()[0].enabled =isAudio
  }
- let IsCamera =true
- function MuteVideo(IsCamera){
-     IsCamera =!IsCamera
-     localStream.getVideoTracks()[0].enabled= IsCamera
+ let isCamera =true
+ function MuteVideo() {
+     isCamera =!isCamera
+     localStream.getVideoTracks()[0].enabled= isCamera
  }
