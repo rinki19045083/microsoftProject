@@ -4,23 +4,23 @@ const http= require("http")
 
 const server = http.createServer((req,res)=> {})
 
-server.listen(3000, () =>{
+server.listen(2000, () =>{
     console.log("Listening on port 2000...")
 })
 
 const webSocket = new Socket({httpServer: server})
 
 //array to store data of sender to send reciever when they join the call
-let user= []
+let users= []
 
 
-webSocket.on('request',(req)=>{
+webSocket.on('request', (req) => {
     const connection = req.accept()
 
-    connection.on('message', (mes)=>{
+    connection.on('message', (mes) => {
 
-        const data = JSON.parse(message.utf8Data)
-        const user =findUser(username)
+        const data = JSON.parse(mes.utf8Data)
+        const user =findUser(data.username)
 
         switch(data.type)
         {
@@ -33,8 +33,8 @@ webSocket.on('request',(req)=>{
                     conn: connection,
                     username: data.username
                 }
-                user.push(newuser)
-                console.log(username)
+                users.push(newuser)
+                console.log(newuser.username)
                 break
             case "store_offer" :
                 if(user==null)
@@ -43,21 +43,22 @@ webSocket.on('request',(req)=>{
                 break
             case "store_candidate": 
                  if(user==null)
-                 return
-                 if(user.candidate==null)
+               {  return}
+              if(user.candidate==null)
                 user.candidate= []
-                user.candidate.push=data.candidate
+                user.candidate.push(data.candidate)
                 break
             case "send_answer":
-                if(user==null)
+                if(user == null){
                 return
+                }
                 sendData({
                     type: "answer",
                     answer: data.answer
                 },user.conn)
                 break
             case "send_candidate":
-                if(user==null)
+                if(user == null)
                 return
                 sendData({
                     type: "candidate",
@@ -65,18 +66,18 @@ webSocket.on('request',(req)=>{
                 },user.conn)
                 break
             case "join_call":
-                if(user==null)
+                if(user == null)
                 return
                 sendData({
                     type: "offer",
                     offer: data.offer
                 },connection)
 
-                user.candidate.forEach(candidate => {
+                user.candidates.forEach(candidate => {
                     sendData({
                         type: "candidate",
-                        candidate: user.candidate
-                    },connection)
+                        candidate: candidate
+                    }, connection)
 
                 })
                 break
@@ -84,11 +85,12 @@ webSocket.on('request',(req)=>{
         }
     })
     //to delete the username from user array after closing connect
+    
     connection.on('close',(reason,description)=> {
-        user.forEach(user=>{
-            if(user.conn=connection)
+        users.forEach(user => {
+            if(user.conn==connection)
             {
-            user.splice(user.indexOf(user),1)
+            users.splice(users.indexOf(user),1)
             return
             }
         })
@@ -96,13 +98,13 @@ webSocket.on('request',(req)=>{
 
 })
 
-function sendData(data,conn) {
+function sendData(data, conn) {
     conn.send(JSON.stringify(data))
     
 }
 function findUser(username) {
-    for(let i=0;i<user.length;i++)
-    if(user[i]==username)
-    return user[i]
-    
+    for(let i=0;i<users.length;i++){
+    if(users[i].username == username)
+    return users[i]
+    }
 } 
